@@ -1,7 +1,7 @@
 What is this
 ------------
 
-Demonstration for running applications on top of Pyramid.
+Demonstration for running applications on top of [Pyramid](https://github.com/function61/pyramid).
 
 This tutorial assumes that you're coming from/are familiar with the
 [Quickstart guide](https://github.com/function61/pyramid/tree/master/docs/quickstart.md)
@@ -10,6 +10,7 @@ This tutorial assumes that you're coming from/are familiar with the
 Architecture of this app
 ------------------------
 
+- Golang, Linux, Docker
 - Embedded database (BoltDB)
 - ORM layer (Storm) on top of BoltDB. Normally I wouldn't recommend using an ORM
   but it was the least amount of code to persist data.
@@ -31,6 +32,15 @@ $ pyramid stream-create /_subscriptions/foo
 $ pyramid stream-subscribe /foostream foo
 ```
 
+Now when taking a peek at our subscription stream, we should see the tip of the
+`/foostream` having been advertised:
+
+```
+$ pyramid stream-liveread /_subscriptions/foo:0:0 10
+.Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
+.SubscriptionActivity {"activity":["/foostream:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
+```
+
 Now, let's enter some sample data into the stream so our database will not be empty:
 
 ```
@@ -38,6 +48,22 @@ $ pyramid stream-appendfromfile /foostream example-dataimport/import.txt
 2017/03/22 14:55:59 Appending 21 lines
 2017/03/22 14:55:59 Done. Imported 21 lines in 135.305288ms.
 ```
+
+If you'd now liveread the foo subscription again, we'd notice that there are
+new notifications on the stream:
+
+```
+$ pyramid stream-liveread /_subscriptions/foo:0:0 10
+.Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
+.SubscriptionActivity {"activity":["/foostream:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
+.SubscriptionActivity {"activity":["/foostream:0:2417:1.2.3.4"],"ts":"2017-03-22T14:56:04.601Z"}
+.SubscriptionActivity {"activity":["/foostream:0:2535:1.2.3.4"],"ts":"2017-03-22T15:16:00.62Z"}
+```
+
+Now you understand the mechanism for how Pusher knows which streams to push to
+the endpoint - it just monitors the subscription stream which subscribed streams
+have stuff the endpoint should be aware of! There's a bit more but that's the basic idea.
+
 
 Now start the service
 ---------------------
