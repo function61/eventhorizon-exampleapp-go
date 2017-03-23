@@ -1,16 +1,13 @@
 FROM golang:1.8.0
 
 # Install Pyramid
-RUN curl --fail -s https://s3.amazonaws.com/files.function61.com/pyramid/pyramid.20170322.linux-amd64.tar.gz \
+RUN curl --fail -s https://s3.amazonaws.com/files.function61.com/pyramid/pyramid.20170323.linux-amd64.tar.gz \
 	| tar -C /usr/bin -xzf -
 
-RUN mkdir -p /go/src/github.com/function61 \
-	&& ln -s /app /go/src/github.com/function61/pyramid-exampleapp-go
+CMD /go/src/github.com/function61/pyramid-exampleapp-go/pyramid-exampleapp-go
 
-CMD /app/app
+WORKDIR /go/src/github.com/function61/pyramid-exampleapp-go
 
-WORKDIR /app
-
-COPY / /app
+COPY / /go/src/github.com/function61/pyramid-exampleapp-go
 
 RUN go get -d ./... && go build .
