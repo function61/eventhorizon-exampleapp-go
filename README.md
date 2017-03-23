@@ -77,6 +77,7 @@ First, build the application:
 
 ```
 $ docker build -t pyramid-exampleapp-go .
+```
 
 Then, run your application. Like with the Pyramid CLI, you have to specify the
 `STORE` so the Pusher component can push events to your application:
