@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/asdine/storm"
 	"github.com/boltdb/bolt"
-	"github.com/function61/pyramid/cli"
 	"github.com/function61/pyramid-exampleapp-go/events"
 	"github.com/function61/pyramid-exampleapp-go/transaction"
+	"github.com/function61/pyramid/cli"
 	"github.com/function61/pyramid/pusher/pushlib"
 	"github.com/function61/pyramid/util/lineformatsimple"
 	"log"
@@ -26,7 +26,7 @@ func NewApp() *App {
 	// in multi-tenant architectures if you split your tenants between servers/clusters:
 	// - cluster 1 could subscribe to /tenants/1, /tenants/3, /tenants/5, ...
 	// - cluster 2 could subscribe to /tenants/2, /tenants/4, /tenants/6 ...
-	// 
+	//
 	// and moving /tenant/3 between clusters is simply:
 	// 1) subscribe cluster 2 to /tenant/3
 	// 2) wait for cluster 2 to reach realtime with the tenant-to-migrate
@@ -60,7 +60,7 @@ func (a *App) Run() {
 	// start Pusher child process which will push stream updates to our HTTP
 	// endpoint. the child process automatically exits if the parent (= us) exits,
 	// so 1:1 relationship with Pusher <=> app endpoint is kind of enforced.
-	// 
+	//
 	// this design means that you cannot have multiple instances of your app
 	// running per server unless a) your app instances use different ports
 	// b) you use Docker so all the instances have their own network namespace.
@@ -108,7 +108,7 @@ func (a *App) PushHandleEvent(eventSerialized string, tx_ interface{}) error {
 
 // We keep track of the offsets for each stream we follow. This example app
 // follows just two:
-// 
+//
 // - /_sub/example-app
 // - /example
 func (a *App) PushGetOffset(stream string, tx_ interface{}) (string, bool) {
