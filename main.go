@@ -94,8 +94,11 @@ func (a *App) PushHandleEvent(eventSerialized string, tx_ interface{}) error {
 		return err
 	}
 
-	if fn, fnExists := events.EventNameToApplyFn[eventType]; fnExists {
-		return fn(tx, payload)
+	// call event handler (determined by the event type), see the events/ directory.
+	if handlerFn, fnExists := events.EventNameToApplyFn[eventType]; fnExists {
+		// this is where the most interesting parts happen - how the app reacts
+		// to incoming events by modifying the database
+		return handlerFn(tx, payload)
 	}
 
 	log.Printf("App: unknown event: %s", eventSerialized)
