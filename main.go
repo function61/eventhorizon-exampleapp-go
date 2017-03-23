@@ -31,7 +31,7 @@ func NewApp() *App {
 	// 1) subscribe cluster 2 to /tenant/3
 	// 2) wait for cluster 2 to reach realtime with the tenant-to-migrate
 	// 3) unsubscribe cluster 1 from /tenant/3
-	subscriptionId := "foo"
+	subscriptionId := "/_sub/example-app"
 
 	db, err := storm.Open("/tmp/app.db")
 	if err != nil {
@@ -109,8 +109,8 @@ func (a *App) PushHandleEvent(eventSerialized string, tx_ interface{}) error {
 // We keep track of the offsets for each stream we follow. This example app
 // follows just two:
 // 
-// - /_subscriptions/foo
-// - /foostream
+// - /_sub/example-app
+// - /example
 func (a *App) PushGetOffset(stream string, tx_ interface{}) (string, bool) {
 	tx := tx_.(*transaction.Tx)
 

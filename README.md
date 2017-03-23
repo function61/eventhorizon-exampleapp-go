@@ -22,48 +22,51 @@ Architecture of this app
 Setup streams etc.
 ------------------
 
-Our app will listen on events in `/foostream`.
+Our app will listen to events in `/example`.
 [Enter Pyramid CLI](https://github.com/function61/pyramid/blob/master/docs/enter-pyramid-cli.md)
 and create the stream:
 
 ```
-$ pyramid stream-create /foostream
+$ pyramid stream-create /example
 ```
 
-We'll need to create a subscription (`foo`) and subscribe it to `/foostream`:
+We'll need to create a subscription (`example-app`) and subscribe it to `/example`:
 
 ```
-$ pyramid stream-create /_subscriptions/foo
-$ pyramid stream-subscribe /foostream foo
+$ pyramid stream-create /_sub/example-app
+$ pyramid stream-subscribe /example /_sub/example-app
 ```
+
+A subscription is just a regular stream under the covers. The only difference is
+that you cannot subscribe to subscriptions, because that would enable an infinite loop.
 
 Now when taking a peek at our subscription stream, we should see the tip of the
-`/foostream` having been advertised:
+`/example` having been advertised:
 
 ```
-$ pyramid stream-liveread /_subscriptions/foo:0:0 10
+$ pyramid stream-liveread /_sub/example-app:0:0 10
 .Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
-.SubscriptionActivity {"activity":["/foostream:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
+.SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
 ```
 
 Now, let's enter some The Office -themed sample data into the stream so our
 database will not be empty:
 
 ```
-$ pyramid stream-appendfromfile /foostream example-dataimport/import.txt
+$ pyramid stream-appendfromfile /example example-dataimport/import.txt
 2017/03/22 14:55:59 Appending 21 lines
 2017/03/22 14:55:59 Done. Imported 21 lines in 135.305288ms.
 ```
 
-If you'd now liveread the foo subscription again, we'd notice that there are
+If you'd now liveread the example-app subscription again, we'd notice that there are
 new notifications on the stream:
 
 ```
-$ pyramid stream-liveread /_subscriptions/foo:0:0 10
+$ pyramid stream-liveread /_sub/example-app:0:0 10
 .Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
-.SubscriptionActivity {"activity":["/foostream:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
-.SubscriptionActivity {"activity":["/foostream:0:2417:1.2.3.4"],"ts":"2017-03-22T14:56:04.601Z"}
-.SubscriptionActivity {"activity":["/foostream:0:2535:1.2.3.4"],"ts":"2017-03-22T15:16:00.62Z"}
+.SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
+.SubscriptionActivity {"activity":["/example:0:2417:1.2.3.4"],"ts":"2017-03-22T14:56:04.601Z"}
+.SubscriptionActivity {"activity":["/example:0:2535:1.2.3.4"],"ts":"2017-03-22T15:16:00.62Z"}
 ```
 
 Now you understand the mechanism for how Pusher knows which streams to push to
@@ -91,7 +94,7 @@ $ docker run -it --rm -e STORE='...' pyramid-exampleapp-go
 2017/03/22 15:04:37 pusherchild: starting
 2017/03/22 15:04:37 configfactory: downloading discovery file
 ...
-2017/03/22 15:04:37 Pusher: reached the top for /_subscriptions/foo
+2017/03/22 15:04:37 Pusher: reached the top for /_sub/example-app
 ```
 
 Ok it's succesfully started.
@@ -126,7 +129,7 @@ If you look at [events/usernamechanged.go](events/usernamechanged.go), you'll
 learn that we can do this (in the CLI):
 
 ```
-$ pyramid stream-append /foostream 'UserNameChanged {"user_id": "e1dd2e26", "new_name": "Kelly Kaling", "reason": "Married", "ts": "2017-03-22 00:00:00"}'
+$ pyramid stream-append /example 'UserNameChanged {"user_id": "e1dd2e26", "new_name": "Kelly Kaling", "reason": "Married", "ts": "2017-03-22 00:00:00"}'
 ```
 
 And now inspect the data:
