@@ -4,7 +4,10 @@ What is this
 Demonstration for running applications on top of [Pyramid](https://github.com/function61/pyramid).
 
 This tutorial assumes that you're coming from/are familiar with the
-[Quickstart guide](https://github.com/function61/pyramid/tree/master/docs/quickstart.md)
+[Quickstart guide](https://github.com/function61/pyramid/tree/master/docs/quickstart.md).
+
+The meat of the project is in [main.go](main.go) which is well documented and
+you should read it.
 
 
 Architecture of this app
