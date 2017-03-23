@@ -19,7 +19,9 @@ Architecture of this app
 Setup streams etc.
 ------------------
 
-Our app will listen on events in `/foostream`. Create it:
+Our app will listen on events in `/foostream`.
+[Enter Pyramid CLI](https://github.com/function61/pyramid/blob/master/docs/enter-pyramid-cli.md)
+and create the stream:
 
 ```
 $ pyramid stream-create /foostream
@@ -65,12 +67,21 @@ Now you understand the mechanism for how Pusher knows which streams to push to
 the endpoint - it just monitors the subscription stream which subscribed streams
 have stuff the endpoint should be aware of! There's a bit more but that's the basic idea.
 
+You can now exit from the CLI.
 
-Now start the service
----------------------
+
+Now start the example application
+---------------------------------
+
+First, build the application:
 
 ```
 $ docker build -t pyramid-exampleapp-go .
+
+Then, run your application. Like with the Pyramid CLI, you have to specify the
+`STORE` so the Pusher component can push events to your application:
+
+```
 $ docker run -it --rm -e STORE='...' pyramid-exampleapp-go
 2017/03/22 15:04:37 App: listening at :8080
 2017/03/22 15:04:37 pusherchild: starting
@@ -82,8 +93,8 @@ $ docker run -it --rm -e STORE='...' pyramid-exampleapp-go
 Ok it's succesfully started.
 
 
-Interacting with the service
-----------------------------
+Interacting with the example application
+----------------------------------------
 
 This service has an internal projection of all the events it saw, i.e. it has
 a database and you can query the database via its REST endpoint:
@@ -108,7 +119,7 @@ But here's the interesting bit: we can skip that application altogether, and use
 Pyramid to directly change Kelly's (`id=e1dd2e26`) name!
 
 If you look at [events/usernamechanged.go](events/usernamechanged.go), you'll
-learn that we can do this:
+learn that we can do this (in the CLI):
 
 ```
 $ pyramid stream-append /foostream 'UserNameChanged {"user_id": "e1dd2e26", "new_name": "Kelly Kaling", "reason": "Married", "ts": "2017-03-22 00:00:00"}'
