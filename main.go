@@ -27,8 +27,10 @@ func NewApp() *App {
 	// - cluster 1 could subscribe to /tenants/1, /tenants/3, /tenants/5, ...
 	// - cluster 2 could subscribe to /tenants/2, /tenants/4, /tenants/6 ...
 	// 
-	// and moving /tenant/54321 between clusters is simply unsubscribing cluster 1'
-	// subscription from /tenant/54321 and subscribing cluster 2's subscription to /tenant/54321
+	// and moving /tenant/3 between clusters is simply:
+	// 1) subscribe cluster 2 to /tenant/3
+	// 2) wait for cluster 2 to reach realtime with the tenant-to-migrate
+	// 3) unsubscribe cluster 1 from /tenant/3
 	subscriptionId := "foo"
 
 	db, err := storm.Open("/tmp/app.db")
