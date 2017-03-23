@@ -13,7 +13,7 @@ Architecture of this app
 - Golang, Linux, Docker
 - Embedded database (BoltDB)
 - ORM layer (Storm) on top of BoltDB. Normally I wouldn't recommend using an ORM
-  but it was the least amount of code to persist data.
+  but it was the least amount of code to persist data to make this demo work.
 
 
 Setup streams etc.
@@ -41,7 +41,8 @@ $ pyramid stream-liveread /_subscriptions/foo:0:0 10
 .SubscriptionActivity {"activity":["/foostream:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
 ```
 
-Now, let's enter some sample data into the stream so our database will not be empty:
+Now, let's enter some The Office -themed sample data into the stream so our
+database will not be empty:
 
 ```
 $ pyramid stream-appendfromfile /foostream example-dataimport/import.txt
@@ -110,7 +111,7 @@ If you look at [events/usernamechanged.go](events/usernamechanged.go), you'll
 learn that we can do this:
 
 ```
-$ pyramid stream-append /foostream 'UserNameChanged {"user_id": "e1dd2e26", "ts": "2017-03-22 00:00:00", "new_name": "Kelly Kaling", "reason": "Married"}'
+$ pyramid stream-append /foostream 'UserNameChanged {"user_id": "e1dd2e26", "new_name": "Kelly Kaling", "reason": "Married", "ts": "2017-03-22 00:00:00"}'
 ```
 
 And now inspect the data:
