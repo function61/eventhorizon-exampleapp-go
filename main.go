@@ -81,8 +81,9 @@ func (a *App) Run() {
 
 // this is where all the magic happens. pushlib calls this function for every
 // incoming event from Pyramid.
-func (a *App) PushHandleEvent(eventSerialized string, tx interface{}) error {
-	txReal := tx.(*transaction.Tx)
+// TODO: have meta info coming in
+func (a *App) PushHandleEvent(eventSerialized string, tx_ interface{}) error {
+	tx := tx_.(*transaction.Tx)
 
 	// 'FooEvent {"bar": "input here"}'
 	//     => eventType='FooEvent'
@@ -94,7 +95,7 @@ func (a *App) PushHandleEvent(eventSerialized string, tx interface{}) error {
 	}
 
 	if fn, fnExists := events.EventNameToApplyFn[eventType]; fnExists {
-		return fn(txReal, payload)
+		return fn(tx, payload)
 	}
 
 	log.Printf("App: unknown event: %s", eventSerialized)
@@ -107,14 +108,14 @@ func (a *App) PushHandleEvent(eventSerialized string, tx interface{}) error {
 // 
 // - /_subscriptions/foo
 // - /foostream
-func (a *App) PushGetOffset(stream string, tx interface{}) (string, bool) {
-	txReal := tx.(*transaction.Tx)
+func (a *App) PushGetOffset(stream string, tx_ interface{}) (string, bool) {
+	tx := tx_.(*transaction.Tx)
 
 	// We don't have to verify stream names because those are based on the
 	// subscription and we are only subscribed to streams that we know we want to follow.
 
 	offset := ""
-	if err := txReal.Db.WithTransaction(txReal.Tx).Get("cursors", stream, &offset); err != nil {
+	if err := tx.Db.WithTransaction(tx.Tx).Get("cursors", stream, &offset); err != nil {
 		if err == storm.ErrNotFound {
 			// if we don't yet have an offset stored, that instructs Pusher to
 			// start reading from the stream beginning.
@@ -132,10 +133,10 @@ func (a *App) PushGetOffset(stream string, tx interface{}) (string, bool) {
 
 // called at end of stream processing to set the offset-in-stream from which we
 // expect the next Push to start at.
-func (a *App) PushSetOffset(stream string, offset string, tx interface{}) error {
-	txReal := tx.(*transaction.Tx)
+func (a *App) PushSetOffset(stream string, offset string, tx_ interface{}) error {
+	tx := tx_.(*transaction.Tx)
 
-	if err := txReal.Db.WithTransaction(txReal.Tx).Set("cursors", stream, offset); err != nil {
+	if err := tx.Db.WithTransaction(tx.Tx).Set("cursors", stream, offset); err != nil {
 		return err
 	}
 
