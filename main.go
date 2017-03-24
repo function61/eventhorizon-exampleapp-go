@@ -7,6 +7,7 @@ import (
 	"github.com/function61/pyramid-exampleapp-go/transaction"
 	"github.com/function61/pyramid/cli"
 	"github.com/function61/pyramid/pusher/pushlib"
+	"github.com/function61/pyramid/util/cryptorandombytes"
 	"github.com/function61/pyramid/util/lineformatsimple"
 	"log"
 	"net/http"
@@ -57,6 +58,8 @@ func (a *App) Run() {
 	// start serving data over REST for companies and users (our data model)
 	a.setupJsonRestApi()
 
+	pusherAuthToken := cryptorandombytes.Hex(8)
+
 	// start Pusher child process which will push stream updates to our HTTP
 	// endpoint. the child process automatically exits if the parent (= us) exits,
 	// so 1:1 relationship with Pusher <=> app endpoint is kind of enforced.
@@ -64,10 +67,10 @@ func (a *App) Run() {
 	// this design means that you cannot have multiple instances of your app
 	// running per server unless a) your app instances use different ports
 	// b) you use Docker so all the instances have their own network namespace.
-	go pushlib.StartChildProcess("http://127.0.0.1:8080/_pyramid_push")
+	go pushlib.StartChildProcess("http://127.0.0.1:8080/_pyramid_push?auth=" + pusherAuthToken)
 
-	// sets up HTTP path "/_pyramid_push" for receiving pushes
-	a.pushListener.AttachPushHandler()
+	// attach pushlib to receive pushes at this path
+	a.pushListener.AttachPushHandler("/_pyramid_push", pusherAuthToken)
 
 	srv := &http.Server{Addr: ":8080"}
 
