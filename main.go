@@ -15,8 +15,8 @@ import (
 
 // implements PushAdapter interface from pushlib
 type App struct {
-	pushListener *pushlib.Listener
-	db           *storm.DB
+	pushLibrary *pushlib.Library
+	db          *storm.DB
 }
 
 func NewApp() *App {
@@ -47,7 +47,7 @@ func NewApp() *App {
 	// init pushlib. we give reference to an object (this - our app) that
 	// implements "PushAdapter" interface (all methods in this file prefixed
 	// "Push"), which pushlib calls to process incoming event streams
-	a.pushListener = pushlib.New(
+	a.pushLibrary = pushlib.New(
 		subscriptionId,
 		a)
 
@@ -70,7 +70,7 @@ func (a *App) Run() {
 	go pushlib.StartChildProcess("http://127.0.0.1:8080/_pyramid_push?auth=" + pusherAuthToken)
 
 	// attach pushlib to receive pushes at this path
-	a.pushListener.AttachPushHandler("/_pyramid_push", pusherAuthToken)
+	a.pushLibrary.AttachPushHandler("/_pyramid_push", pusherAuthToken)
 
 	srv := &http.Server{Addr: ":8080"}
 
