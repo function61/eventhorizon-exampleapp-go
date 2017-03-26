@@ -5,8 +5,8 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/function61/pyramid-exampleapp-go/events"
 	"github.com/function61/pyramid-exampleapp-go/transaction"
-	"github.com/function61/pyramid/cli"
 	"github.com/function61/pyramid/pusher/pushlib"
+	"github.com/function61/pyramid/util/clicommon"
 	"github.com/function61/pyramid/util/cryptorandombytes"
 	"github.com/function61/pyramid/util/lineformatsimple"
 	"log"
@@ -175,5 +175,5 @@ func main() {
 	receiver := NewApp()
 	receiver.Run()
 
-	cli.WaitForInterrupt()
+	clicommon.WaitForInterrupt()
 }
