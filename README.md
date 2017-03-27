@@ -38,15 +38,15 @@ $ pyramid stream-subscribe /example /_sub/example-app
 ```
 
 A subscription is just a regular stream under the covers. The only difference is
-that you cannot subscribe to subscriptions, because that would enable an infinite loop.
+that you cannot subscribe to subscriptions, because that would create an infinite loop.
 
 Now when taking a peek at our subscription stream, we should see the tip of the
 `/example` having been advertised:
 
 ```
 $ pyramid stream-liveread /_sub/example-app:0:0 10
-.Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
-.SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
+/Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
+/SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
 ```
 
 Now, let's enter some The Office -themed sample data into the stream so our
@@ -63,10 +63,10 @@ new notifications on the stream:
 
 ```
 $ pyramid stream-liveread /_sub/example-app:0:0 10
-.Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
-.SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
-.SubscriptionActivity {"activity":["/example:0:2417:1.2.3.4"],"ts":"2017-03-22T14:56:04.601Z"}
-.SubscriptionActivity {"activity":["/example:0:2535:1.2.3.4"],"ts":"2017-03-22T15:16:00.62Z"}
+/Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
+/SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
+/SubscriptionActivity {"activity":["/example:0:2417:1.2.3.4"],"ts":"2017-03-22T14:56:04.601Z"}
+/SubscriptionActivity {"activity":["/example:0:2535:1.2.3.4"],"ts":"2017-03-22T15:16:00.62Z"}
 ```
 
 Now you understand the mechanism for how Pusher knows which streams to push to
