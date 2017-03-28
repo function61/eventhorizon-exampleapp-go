@@ -120,7 +120,7 @@ func (a *App) PushHandleEvent(line *rtypes.ReadResultLine, tx_ interface{}) erro
 //
 // - /_sub/example-app
 // - /example
-func (a *App) PushGetOffset(stream string, tx_ interface{}) (string, bool) {
+func (a *App) PushGetOffset(stream string, tx_ interface{}) (string, error) {
 	tx := tx_.(*transaction.Tx)
 
 	// We don't have to verify stream names because those are based on the
@@ -131,16 +131,16 @@ func (a *App) PushGetOffset(stream string, tx_ interface{}) (string, bool) {
 		if err == storm.ErrNotFound {
 			// if we don't yet have an offset stored, that instructs Pusher to
 			// start reading from the stream beginning.
-			return "", false
+			return "", nil
 		}
 
 		// database read error?
-		panic(err)
+		return "", err
 	}
 
 	// ok we had an offset stored. pushlib asserts that new pushes continue from
 	// this offset, guaranteeing us exactly-once delivery (no missed events, no re-processes)
-	return offset, true
+	return offset, nil
 }
 
 // called at end of stream processing to set the offset-in-stream from which we
