@@ -17,6 +17,7 @@ import (
 type App struct {
 	pushLibrary *pushlib.Library
 	db          *storm.DB
+	httpSrv *http.Server
 }
 
 func NewApp() *App {
@@ -42,6 +43,7 @@ func NewApp() *App {
 
 	a := &App{
 		db: db,
+		httpSrv : &http.Server{Addr: ":8080"},
 	}
 
 	// init pushlib. we give reference to an object (this - our app) that
@@ -69,17 +71,17 @@ func (a *App) Run() {
 	// b) you use Docker so all the instances have their own network namespace.
 	go pushlib.StartChildProcess("http://127.0.0.1:8080/_pyramid_push?auth=" + pusherAuthToken)
 
+	// start HTTP server
+	go func(){
+		log.Printf("App: listening at %s", a.httpSrv.Addr)
+		if err := a.httpSrv.ListenAndServe(); err != nil {
+			// cannot panic, because this probably is an intentional close
+			log.Printf("App: ListenAndServe() error: %s", err)
+		}
+	}()
+
 	// attach pushlib to receive pushes at this path
 	a.pushLibrary.AttachPushHandler("/_pyramid_push", pusherAuthToken)
-
-	srv := &http.Server{Addr: ":8080"}
-
-	log.Printf("App: listening at :8080")
-
-	if err := srv.ListenAndServe(); err != nil {
-		// cannot panic, because this probably is an intentional close
-		log.Printf("App: ListenAndServe() error: %s", err)
-	}
 }
 
 // this is where all the magic happens. pushlib calls this function for every
@@ -171,9 +173,21 @@ func (a *App) PushWrapTransaction(run func(interface{}) error) error {
 	return err
 }
 
+func (a *App) Close() {
+	log.Printf("App: shutting down HTTP server")
+
+	if err := a.httpSrv.Shutdown(nil); err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	receiver := NewApp()
 	receiver.Run()
 
 	clicommon.WaitForInterrupt()
+
+	receiver.Close()
+
+	log.Printf("main: exiting")
 }
