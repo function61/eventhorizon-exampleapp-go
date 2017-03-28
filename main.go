@@ -6,6 +6,7 @@ import (
 	"github.com/function61/pyramid-exampleapp-go/events"
 	"github.com/function61/pyramid-exampleapp-go/transaction"
 	"github.com/function61/pyramid/pusher/pushlib"
+	rtypes "github.com/function61/pyramid/reader/types"
 	"github.com/function61/pyramid/util/clicommon"
 	"github.com/function61/pyramid/util/cryptorandombytes"
 	"github.com/function61/pyramid/util/lineformatsimple"
@@ -17,7 +18,7 @@ import (
 type App struct {
 	pushLibrary *pushlib.Library
 	db          *storm.DB
-	httpSrv *http.Server
+	httpSrv     *http.Server
 }
 
 func NewApp() *App {
@@ -42,8 +43,8 @@ func NewApp() *App {
 	// defer db.Close()
 
 	a := &App{
-		db: db,
-		httpSrv : &http.Server{Addr: ":8080"},
+		db:      db,
+		httpSrv: &http.Server{Addr: ":8080"},
 	}
 
 	// init pushlib. we give reference to an object (this - our app) that
@@ -72,7 +73,7 @@ func (a *App) Run() {
 	go pushlib.StartChildProcess("http://127.0.0.1:8080/_pyramid_push?auth=" + pusherAuthToken)
 
 	// start HTTP server
-	go func(){
+	go func() {
 		log.Printf("App: listening at %s", a.httpSrv.Addr)
 		if err := a.httpSrv.ListenAndServe(); err != nil {
 			// cannot panic, because this probably is an intentional close
@@ -86,14 +87,17 @@ func (a *App) Run() {
 
 // this is where all the magic happens. pushlib calls this function for every
 // incoming event from Pyramid.
-// TODO: have meta info coming in
-func (a *App) PushHandleEvent(eventSerialized string, tx_ interface{}) error {
+func (a *App) PushHandleEvent(line *rtypes.ReadResultLine, tx_ interface{}) error {
 	tx := tx_.(*transaction.Tx)
+
+	if line.MetaType != "" { // ignore meta events
+		return nil
+	}
 
 	// 'FooEvent {"bar": "input here"}'
 	//     => eventType='FooEvent'
 	//     => payload='{"bar": "input here"}'
-	eventType, payload, err := lineformatsimple.Parse(eventSerialized)
+	eventType, payload, err := lineformatsimple.Parse(line.Content)
 
 	if err != nil {
 		return err
@@ -106,7 +110,7 @@ func (a *App) PushHandleEvent(eventSerialized string, tx_ interface{}) error {
 		return handlerFn(tx, payload)
 	}
 
-	log.Printf("App: unknown event: %s", eventSerialized)
+	log.Printf("App: unknown event: %s", line.Content)
 
 	return nil
 }
