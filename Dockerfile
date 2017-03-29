@@ -1,7 +1,7 @@
 FROM golang:1.8.0
 
 # Install Pyramid
-RUN curl --fail -s https://s3.amazonaws.com/files.function61.com/pyramid/pyramid.20170323.linux-amd64.tar.gz \
+RUN curl --location --fail -s https://github.com/function61/pyramid/releases/download/v0.1.0/pyramid.20170329.linux-amd64.tar.gz \
 	| tar -C /usr/bin -xzf -
 
 CMD /go/src/github.com/function61/pyramid-exampleapp-go/pyramid-exampleapp-go
