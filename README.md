@@ -44,7 +44,7 @@ Now when taking a peek at our subscription stream, we should see the tip of the
 `/example` having been advertised:
 
 ```
-$ pyramid stream-liveread /_sub/example-app:0:0 10
+$ pyramid reader-read /_sub/example-app:0:0:? 10
 /Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
 /SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
 ```
@@ -58,11 +58,11 @@ $ pyramid stream-appendfromfile /example example-dataimport/import.txt
 2017/03/22 14:55:59 Done. Imported 21 lines in 135.305288ms.
 ```
 
-If you'd now liveread the example-app subscription again, we'd notice that there are
+If you'd now read the example-app subscription again, we'd notice that there are
 new notifications on the stream:
 
 ```
-$ pyramid stream-liveread /_sub/example-app:0:0 10
+$ pyramid reader-read /_sub/example-app:0:0:? 10
 /Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
 /SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
 /SubscriptionActivity {"activity":["/example:0:2417:1.2.3.4"],"ts":"2017-03-22T14:56:04.601Z"}
