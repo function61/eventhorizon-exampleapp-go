@@ -5,15 +5,20 @@ import (
 	"fmt"
 	"github.com/function61/pyramid-exampleapp-go/events"
 	"github.com/function61/pyramid-exampleapp-go/schema"
+	"github.com/function61/pyramid-exampleapp-go/types"
 	"github.com/function61/pyramid/pusher/pushlib/writerproxyclient"
+	"github.com/function61/pyramid/util/cryptorandombytes"
 	wtypes "github.com/function61/pyramid/writer/types"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 func (a *App) setupJsonRestApi() {
 	wpc := writerproxyclient.New()
+
+	hostname, _ := os.Hostname()
 
 	http.Handle("/users", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var users []schema.User
@@ -39,6 +44,20 @@ func (a *App) setupJsonRestApi() {
 		encoder := json.NewEncoder(w)
 		encoder.SetIndent("", "    ")
 		if err := encoder.Encode(companies); err != nil {
+			panic(err)
+		}
+	}))
+
+	http.Handle("/orders", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var orders []schema.Order
+		err := a.db.All(&orders)
+		if err != nil {
+			panic(err)
+		}
+
+		encoder := json.NewEncoder(w)
+		encoder.SetIndent("", "    ")
+		if err := encoder.Encode(orders); err != nil {
 			panic(err)
 		}
 	}))
@@ -81,5 +100,59 @@ func (a *App) setupJsonRestApi() {
 		}
 
 		w.Write([]byte(fmt.Sprintf("OK; offset = %s", output.Offset)))
+	}))
+
+	http.Handle("/command/place_order", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var data types.OrderPlacement
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		var user schema.User
+
+		// make sure the user exists
+		if err := a.db.One("ID", data.User, &user); err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+
+		orderId := cryptorandombytes.Hex(8)
+
+		nowSerialized := time.Now().Format("2006-01-02 15:04:05")
+
+		orderCreated := &events.OrderCreated{
+			Id:   orderId,
+			User: user.ID,
+			Ts:   nowSerialized,
+		}
+
+		evs := []string{orderCreated.Serialize()}
+
+		for _, item := range data.LineItems {
+			lineItemAdded := &events.LineItemAdded{
+				Order:   orderId,
+				Product: item.Product,
+				Amount:  item.Amount,
+				Ts:      nowSerialized,
+			}
+
+			evs = append(evs, lineItemAdded.Serialize())
+		}
+
+		_, err := wpc.Append(&wtypes.AppendToStreamRequest{
+			Stream: "/example",
+			Lines:  evs,
+		})
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// so Feeder can detect when the server changes
+		w.Header().Set("X-Instance", hostname)
+
+		w.Write([]byte(orderId))
 	}))
 }

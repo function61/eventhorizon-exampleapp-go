@@ -12,3 +12,15 @@ type Company struct {
 	ID   string
 	Name string
 }
+
+type LineItem struct {
+	Product string
+	Amount  int
+}
+
+type Order struct {
+	ID        string
+	User      string
+	Ts        string
+	LineItems []LineItem
+}
