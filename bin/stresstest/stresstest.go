@@ -3,7 +3,7 @@ package main
 // A stress testing / reliability / high availability testing utility which bombards
 // the example app with configured number of "place order" requests/second.
 import (
-	"github.com/function61/pyramid/util/clicommon"
+	"github.com/function61/eventhorizon/util/clicommon"
 	"log"
 	"os"
 	"strconv"

@@ -2,8 +2,8 @@ package events
 
 import (
 	"encoding/json"
-	"github.com/function61/pyramid-exampleapp-go/schema"
-	"github.com/function61/pyramid-exampleapp-go/transaction"
+	"github.com/function61/eventhorizon-exampleapp-go/schema"
+	"github.com/function61/eventhorizon-exampleapp-go/transaction"
 )
 
 // UserNameChanged {"user_id": "66cad10b", "new_name": "Phyllis Vance", "reason": "..", "ts": "2016-06-06 06:06:06"}

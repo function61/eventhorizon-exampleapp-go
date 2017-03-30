@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/function61/pyramid-exampleapp-go/types"
+	"github.com/function61/eventhorizon-exampleapp-go/types"
 	"io/ioutil"
 	"math/rand"
 	"net/http"

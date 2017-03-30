@@ -2,8 +2,8 @@ package events
 
 import (
 	"encoding/json"
-	"github.com/function61/pyramid-exampleapp-go/schema"
-	"github.com/function61/pyramid-exampleapp-go/transaction"
+	"github.com/function61/eventhorizon-exampleapp-go/schema"
+	"github.com/function61/eventhorizon-exampleapp-go/transaction"
 )
 
 // UserCreated {"id": "66cad10b", "ts": "2001-01-27 00:00:00", "name": "Darryl Philbin", "company": "c3d2ff02"}

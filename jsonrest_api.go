@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/function61/pyramid-exampleapp-go/events"
-	"github.com/function61/pyramid-exampleapp-go/schema"
-	"github.com/function61/pyramid-exampleapp-go/types"
-	"github.com/function61/pyramid/pusher/pushlib/writerproxyclient"
-	"github.com/function61/pyramid/util/cryptorandombytes"
-	wtypes "github.com/function61/pyramid/writer/types"
+	"github.com/function61/eventhorizon-exampleapp-go/events"
+	"github.com/function61/eventhorizon-exampleapp-go/schema"
+	"github.com/function61/eventhorizon-exampleapp-go/types"
+	"github.com/function61/eventhorizon/pusher/pushlib/writerproxyclient"
+	"github.com/function61/eventhorizon/util/cryptorandombytes"
+	wtypes "github.com/function61/eventhorizon/writer/types"
 	"log"
 	"net/http"
 	"os"
@@ -63,7 +63,7 @@ func (a *App) setupJsonRestApi() {
 	}))
 
 	// example of raising an event from inside our application and sending it to
-	// Pyramid. it will eventually reach our Pusher endpoint and get committed to
+	// Event Horizon. it will eventually reach our Pusher endpoint and get committed to
 	// our database.
 	//
 	// NOTE: normally this command would take in JSON but I was feeling lazy and
@@ -88,7 +88,6 @@ func (a *App) setupJsonRestApi() {
 			Ts:      time.Now().Format("2006-01-02 15:04:05"),
 		}
 
-		// append it to Pyramid
 		output, err := wpc.Append(&wtypes.AppendToStreamRequest{
 			Stream: "/example",
 			Lines:  []string{userNameChanged.Serialize()},

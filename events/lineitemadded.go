@@ -2,8 +2,8 @@ package events
 
 import (
 	"encoding/json"
-	"github.com/function61/pyramid-exampleapp-go/schema"
-	"github.com/function61/pyramid-exampleapp-go/transaction"
+	"github.com/function61/eventhorizon-exampleapp-go/schema"
+	"github.com/function61/eventhorizon-exampleapp-go/transaction"
 )
 
 // LineItemAdded {"order": "66cad10b", "product": "Regular paper", "amount": 3, "ts": "2016-06-06 06:06:06"}

@@ -3,13 +3,13 @@ package main
 import (
 	"github.com/asdine/storm"
 	"github.com/boltdb/bolt"
-	"github.com/function61/pyramid-exampleapp-go/events"
-	"github.com/function61/pyramid-exampleapp-go/transaction"
-	"github.com/function61/pyramid/pusher/pushlib"
-	rtypes "github.com/function61/pyramid/reader/types"
-	"github.com/function61/pyramid/util/clicommon"
-	"github.com/function61/pyramid/util/cryptorandombytes"
-	"github.com/function61/pyramid/util/lineformatsimple"
+	"github.com/function61/eventhorizon-exampleapp-go/events"
+	"github.com/function61/eventhorizon-exampleapp-go/transaction"
+	"github.com/function61/eventhorizon/pusher/pushlib"
+	rtypes "github.com/function61/eventhorizon/reader/types"
+	"github.com/function61/eventhorizon/util/clicommon"
+	"github.com/function61/eventhorizon/util/cryptorandombytes"
+	"github.com/function61/eventhorizon/util/lineformatsimple"
 	"log"
 	"net/http"
 )
@@ -70,7 +70,7 @@ func (a *App) Run() {
 	// this design means that you cannot have multiple instances of your app
 	// running per server unless a) your app instances use different ports
 	// b) you use Docker so all the instances have their own network namespace.
-	go pushlib.StartChildProcess("http://127.0.0.1:8080/_pyramid_push?auth=" + pusherAuthToken)
+	go pushlib.StartChildProcess("http://127.0.0.1:8080/_eventhorizon_push?auth=" + pusherAuthToken)
 
 	// start HTTP server
 	go func() {
@@ -82,11 +82,11 @@ func (a *App) Run() {
 	}()
 
 	// attach pushlib to receive pushes at this path
-	a.pushLibrary.AttachPushHandler("/_pyramid_push", pusherAuthToken)
+	a.pushLibrary.AttachPushHandler("/_eventhorizon_push", pusherAuthToken)
 }
 
 // this is where all the magic happens. pushlib calls this function for every
-// incoming event from Pyramid.
+// incoming event from Event Horizon.
 func (a *App) PushHandleEvent(line *rtypes.ReadResultLine, tx_ interface{}) error {
 	tx := tx_.(*transaction.Tx)
 

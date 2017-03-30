@@ -5,18 +5,18 @@ Setup streams etc.
 ------------------
 
 Our app will listen to events in `/example`.
-[Enter Pyramid CLI](https://github.com/function61/pyramid/blob/master/docs/enter-pyramid-cli.md)
+[Enter Horizon CLI](https://github.com/function61/eventhorizon/blob/master/docs/enter-horizon-cli.md)
 and create the stream:
 
 ```
-$ pyramid stream-create /example
+$ horizon stream-create /example
 ```
 
 We'll need to create a subscription (`example-app`) and subscribe it to `/example`:
 
 ```
-$ pyramid stream-create /_sub/example-app
-$ pyramid stream-subscribe /example /_sub/example-app
+$ horizon stream-create /_sub/example-app
+$ horizon stream-subscribe /example /_sub/example-app
 ```
 
 A subscription is just a regular stream under the covers. The only difference is
@@ -26,7 +26,7 @@ Now when taking a peek at our subscription stream, we should see the tip of the
 `/example` having been advertised:
 
 ```
-$ pyramid reader-read /_sub/example-app:0:0:? 10
+$ horizon reader-read /_sub/example-app:0:0:? 10
 /Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
 /SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
 ```
@@ -35,7 +35,7 @@ Now, let's enter some The Office -themed sample data into the stream so our
 database will not be empty:
 
 ```
-$ pyramid stream-appendfromfile /example example-dataimport/import.txt
+$ horizon stream-appendfromfile /example example-dataimport/import.txt
 2017/03/22 14:55:59 Appending 21 lines
 2017/03/22 14:55:59 Done. Imported 21 lines in 135.305288ms.
 ```
@@ -44,7 +44,7 @@ If you'd now read the example-app subscription again, we'd notice that there are
 new notifications on the stream:
 
 ```
-$ pyramid reader-read /_sub/example-app:0:0:? 10
+$ horizon reader-read /_sub/example-app:0:0:? 10
 /Created {"subscription_ids":[],"ts":"2017-03-22T14:55:49.557Z"}
 /SubscriptionActivity {"activity":["/example:0:135:1.2.3.4"],"ts":"2017-03-22T14:55:59.597Z"}
 /SubscriptionActivity {"activity":["/example:0:2417:1.2.3.4"],"ts":"2017-03-22T14:56:04.601Z"}
@@ -64,14 +64,14 @@ Now start the example application
 First, build the application:
 
 ```
-$ docker build -t pyramid-exampleapp-go .
+$ docker build -t eventhorizon-exampleapp-go .
 ```
 
-Then, run your application. Like with the Pyramid CLI, you have to specify the
+Then, run your application. Like with the Horizon CLI, you have to specify the
 `STORE` so the Pusher component can push events to your application:
 
 ```
-$ docker run -it --rm -e STORE='...' pyramid-exampleapp-go
+$ docker run -it --rm -e STORE='...' eventhorizon-exampleapp-go
 2017/03/22 15:04:37 App: listening at :8080
 2017/03/22 15:04:37 pusherchild: starting
 2017/03/22 15:04:37 configfactory: downloading discovery file
@@ -106,16 +106,16 @@ input, foreign key references etc.
 
 Normally the service itself
 would probably have a UI with forms on how to change the data, which would post
-the changes as events to Pyramid and Pyramid would notify your app of those events.
+the changes as events to Event Horizon and it would notify your app of those events.
 
 But here's the interesting bit: we can skip that application altogether, and use
-Pyramid to directly change Kelly's (`id=e1dd2e26`) name!
+Event Horizon to directly change Kelly's (`id=e1dd2e26`) name!
 
 If you look at [events/usernamechanged.go](events/usernamechanged.go), you'll
 learn that we can do this (in the CLI):
 
 ```
-$ pyramid stream-append /example 'UserNameChanged {"user_id": "e1dd2e26", "new_name": "Kelly Kaling", "reason": "Married", "ts": "2017-03-22 00:00:00"}'
+$ horizon stream-append /example 'UserNameChanged {"user_id": "e1dd2e26", "new_name": "Kelly Kaling", "reason": "Married", "ts": "2017-03-22 00:00:00"}'
 ```
 
 And now inspect the data:

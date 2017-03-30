@@ -2,8 +2,8 @@ package events
 
 import (
 	"encoding/json"
-	"github.com/function61/pyramid-exampleapp-go/schema"
-	"github.com/function61/pyramid-exampleapp-go/transaction"
+	"github.com/function61/eventhorizon-exampleapp-go/schema"
+	"github.com/function61/eventhorizon-exampleapp-go/transaction"
 )
 
 // CompanyCreated {"id": "c3d2ff02", "ts": "2015-03-14 00:00:00", "name": "Dunder Mifflin Paper"}

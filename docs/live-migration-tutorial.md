@@ -55,7 +55,7 @@ Start Writer
 It's up to you on which server you'll run the Writer service (I used `Server A`),
 or you can even run it on a third server.
 
-Follow https://github.com/function61/pyramid/blob/master/docs/quickstart.md
+Follow https://github.com/function61/eventhorizon/blob/master/docs/quickstart.md
 
 tl;dr follows:
 
@@ -63,8 +63,8 @@ Bootstrap Writer:
 
 ```
 $ export STORE=...
-$ docker run --rm -it -e "STORE=$STORE" fn61/pyramid sh
-$ pyramid writer-bootstrap PUBLIC_IP_OF_WRITER_SERVER
+$ docker run --rm -it -e "STORE=$STORE" fn61/eventhorizon sh
+$ horizon writer-bootstrap PUBLIC_IP_OF_WRITER_SERVER
 
 # Ctrl + d
 ```
@@ -72,15 +72,15 @@ $ pyramid writer-bootstrap PUBLIC_IP_OF_WRITER_SERVER
 Then start it:
 
 ```
-$ docker run --name pyramid -d --net=host -e "STORE=$STORE" fn61/pyramid
+$ docker run --name eventhorizon -d --net=host -e "STORE=$STORE" fn61/eventhorizon
 ```
 
 Then bootstrap data structures
 
 ```
-$ docker run --rm -it -e "STORE=$STORE" fn61/pyramid sh
-$ pyramid stream-create /
-$ pyramid stream-create /_sub
+$ docker run --rm -it -e "STORE=$STORE" fn61/eventhorizon sh
+$ horizon stream-create /
+$ horizon stream-create /_sub
 ```
 
 
@@ -91,16 +91,16 @@ Bootstrap app datamodel
 First, bootstrap data structures and load in the example data:
 
 ```
-$ docker run --rm -it -e "STORE=$STORE" fn61/pyramid-exampleapp-go bash
-$ pyramid stream-create /example
-$ pyramid stream-create /_sub/example-app
-$ pyramid stream-subscribe /example /_sub/example-app
-$ pyramid stream-appendfromfile /example example-dataimport/import.txt
+$ docker run --rm -it -e "STORE=$STORE" fn61/eventhorizon-exampleapp-go bash
+$ horizon stream-create /example
+$ horizon stream-create /_sub/example-app
+$ horizon stream-subscribe /example /_sub/example-app
+$ horizon stream-appendfromfile /example example-dataimport/import.txt
 
 # Ctrl + d
 ```
 
-NOTE: we would use plain Pyramid CLI instead of the app's image to run "$ pyramid",
+NOTE: we would use plain Horizon CLI instead of the app's image to run "$ horizon",
 but we need access to the file `example-dataimport/import.txt` which only exists
 in the app image.
 
@@ -113,7 +113,7 @@ Start app in Server A
 Now, start the application:
 
 ```
-$ docker run --name app_a -d -e "STORE=$STORE" -p 80:8080 fn61/pyramid-exampleapp-go
+$ docker run --name app_a -d -e "STORE=$STORE" -p 80:8080 fn61/eventhorizon-exampleapp-go
 
 # check that logs look ok
 $ docker logs app_a
@@ -191,7 +191,7 @@ Start app in Server B
 ---------------------
 
 ```
-$ docker run --name app_b -d -e "STORE=$STORE" -p 80:8080 fn61/pyramid-exampleapp-go
+$ docker run --name app_b -d -e "STORE=$STORE" -p 80:8080 fn61/eventhorizon-exampleapp-go
 ```
 
 Check that the order counts in server A and B match roughly (you cannot ever run
