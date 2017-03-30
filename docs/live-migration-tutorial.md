@@ -14,9 +14,18 @@ This tutorial does not require Digitalocean, Cloudflare or Docker, but is writte
 for that specific combination to form a concrete picture rather than you having to
 fill in too many blanks with your imagination.
 
+It is important to notice that both of the app instances are using their own
+(non-clustered) database, so this really demonstrates live migrating state
+to another system (which is a big deal), instead of just launching a new
+application instance that uses state from a shared database with the old instance
+(which would not be a big deal). In fact, this design would allows you to live
+migrate state to a completely different backend/database stack. Think of
+migrating from MySQL-backed state store to Redis backed state store with zero
+downtime. Kinda cool, right?
 
-Create nodes
-------------
+
+Bring up the servers
+--------------------
 
 Create two servers ("droplets") in Digitalocean:
 
@@ -116,7 +125,32 @@ $ curl http://localhost/users
 Start feeder
 ------------
 
-Feeder is a program that bombards your service by continuously placing in orders.
+Feeder is a program that bombards your service by continuously placing in orders
+via the app's RESTful endpoint.
+
+Orders in the app look like this:
+
+```
+{	
+   "ID": "ffe0a300ac437dfd",
+    "User": "a00ba373",
+    "Ts": "2017-03-29 12:48:21",
+    "LineItems": [
+        {
+            "Product": "Butt paper",
+            "Amount": 6
+        },
+        {
+            "Product": "Regular paper",
+            "Amount": 5
+        },
+        {
+            "Product": "Premium copy paper",
+            "Amount": 8
+        }
+    ]
+}
+```
 
 ```
 ./feeder
