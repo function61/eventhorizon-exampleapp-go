@@ -1,9 +1,11 @@
 Tutorial for live migration
 ---------------------------
 
+![](livemigration.gif)
+
 This tutorial walks you through from zero to 100 % on how to live migrate a
-running service from a server to another, all the while the service is accepting
-meaningful work.
+running service from a server to another with zero downtime, all the while the
+service is accepting meaningful work.
 
 At the end of the tutorial we prove that the service did not experience any
 downtime from the client's perspective.
