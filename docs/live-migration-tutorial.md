@@ -122,11 +122,11 @@ $ curl http://localhost/users
 ]
 ```
 
-Start feeder
-------------
+Start stresstest
+----------------
 
-Feeder is a program that bombards your service by continuously placing in orders
-via the app's RESTful endpoint.
+[Stresstest](../bin/stresstest) is a tool that bombards your service by
+continuously placing in orders via the app's RESTful endpoint.
 
 Orders in the app look like this:
 
@@ -153,18 +153,18 @@ Orders in the app look like this:
 ```
 
 ```
-./feeder
-2017/03/29 13:13:55 Usage: ./feeder <baseUrl> <ordersPerSec>
+./stresstest
+2017/03/29 13:13:55 Usage: ./stresstest <baseUrl> <ordersPerSec>
 ```
 
 ordersPerSec is the target amount of orders to place per second. I seemed to get
-exactly 40 so the throughput was either capped by Cloudflare or Feeder's parallelism
-which is currently capped at 20 workers.
+exactly 40 so the throughput was either capped by Cloudflare or stresstest's
+parallelism which is currently capped at 20 workers.
 
 Now you'll be getting output like this:
 
 ```
-$ ./feeder https://ha.xs.fi 100
+$ ./stresstest https://ha.xs.fi 100
 2017/03/29 12:47:31 producer: failed = 0 succeeded = 0
 2017/03/29 12:47:32 producer: failed = 0 succeeded = 4
 2017/03/29 12:47:33 producer: failed = 0 succeeded = 40
@@ -211,7 +211,7 @@ Change the IP now.
 
 Due to how Cloudflare works, this change is almost instant and not affected by DNS TTL.
 
-Look at your feeder logs, and feeder soon notices that the server changed:
+Look at your stresstest output - it soon notices that the server changed:
 
 ```
 2017/03/29 12:49:02 responseprocessor: instance change detected: 93920041d320
@@ -242,10 +242,10 @@ You can now stop the application on `Server A`:
 $ docker rm -f app_a
 ```
 
-And verify that feeder does not report any errors (it shouldnt, because the old
+And verify that stresstest does not report any errors (it shouldnt, because the old
 server is not used anymore)
 
-You can now stop feeder (`Ctrl + c`) and we'll get the aggregate statistics:
+You can now stop the stresstest (`Ctrl + c`) and we'll get the aggregate statistics:
 
 ```
 2017/03/29 12:49:21 producer: failed = 0 succeeded = 40

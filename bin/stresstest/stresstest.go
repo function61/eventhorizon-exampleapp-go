@@ -15,8 +15,8 @@ const (
 	numWorkers = 20
 )
 
-// there are about $numWorkers of these workers feeding off of the queue
-func StresserWorker(workSubmit chan bool, workResponse chan *WorkResponse, wg *sync.WaitGroup, baseUrl string) {
+// there are $numWorkers of these workers feeding off of the queue
+func StressTesterWorker(workSubmit chan bool, workResponse chan *WorkResponse, wg *sync.WaitGroup, baseUrl string) {
 	defer wg.Done()
 
 	for range workSubmit {
@@ -30,8 +30,8 @@ func StresserWorker(workSubmit chan bool, workResponse chan *WorkResponse, wg *s
 	}
 }
 
-func NewStresser(baseUrl string, ordersPerSec int) *Stresser {
-	return &Stresser{
+func NewStressTester(baseUrl string, ordersPerSec int) *StressTester {
+	return &StressTester{
 		workSubmit:     make(chan bool, numWorkers),
 		workResponse:   make(chan *WorkResponse),
 		stopProducer:   make(chan bool),
@@ -43,13 +43,13 @@ func NewStresser(baseUrl string, ordersPerSec int) *Stresser {
 	}
 }
 
-func (f *Stresser) Run() {
+func (f *StressTester) Run() {
 	f.started = time.Now()
 
 	// start workers
 	for i := 0; i < numWorkers; i++ {
 		f.workersStopped.Add(1)
-		go StresserWorker(f.workSubmit, f.workResponse, f.workersStopped, f.baseUrl)
+		go StressTesterWorker(f.workSubmit, f.workResponse, f.workersStopped, f.baseUrl)
 	}
 
 	// work producer
@@ -108,7 +108,7 @@ func (f *Stresser) Run() {
 	}()
 }
 
-func (f *Stresser) Close() {
+func (f *StressTester) Close() {
 	log.Printf("stopping")
 
 	f.stopProducer <- true
@@ -129,7 +129,7 @@ func main() {
 		panic(err)
 	}
 
-	f := NewStresser(baseUrl, ordersPerSec)
+	f := NewStressTester(baseUrl, ordersPerSec)
 
 	f.Run()
 

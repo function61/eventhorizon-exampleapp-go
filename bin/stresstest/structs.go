@@ -28,7 +28,7 @@ type WorkResponse struct {
 	err        error
 }
 
-type Stresser struct {
+type StressTester struct {
 	workSubmit     chan bool
 	workResponse   chan *WorkResponse
 	stopProducer   chan bool
