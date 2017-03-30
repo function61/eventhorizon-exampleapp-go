@@ -132,7 +132,7 @@ Orders in the app look like this:
 
 ```
 {	
-   "ID": "ffe0a300ac437dfd",
+    "ID": "ffe0a300ac437dfd",
     "User": "a00ba373",
     "Ts": "2017-03-29 12:48:21",
     "LineItems": [
@@ -183,8 +183,9 @@ Start app in Server B
 $ docker run --name app_b -d -e "STORE=$STORE" -p 80:8080 fn61/pyramid-exampleapp-go
 ```
 
-Check that the order counts in server A and B match roughtly - that's how we know
-we reached realtime:
+Check that the order counts in server A and B match roughly (you cannot ever run
+two commands on different servers in exactly the same moment) - that's how we
+know we reached realtime:
 
 ```
 # on Server A
