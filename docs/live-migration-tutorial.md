@@ -18,10 +18,17 @@ It is important to notice that both of the app instances are using their own
 (non-clustered) database, so this really demonstrates live migrating state
 to another system (which is a big deal), instead of just launching a new
 application instance that uses state from a shared database with the old instance
-(which would not be a big deal). In fact, this design would allows you to live
-migrate state to a completely different backend/database stack. Think of
-migrating from MySQL-backed state store to Redis backed state store with zero
-downtime. Kinda cool, right?
+(which would not be a big deal).
+
+In fact, this design would even allow you to live migrate state to a completely
+different backend/database stack. Think of migrating from MySQL-backed state
+store to Redis backed state store with zero downtime. Kinda cool, right?
+
+Also, as you can see in one point in this tutorial, the different instances are
+both serving requests at the same time. That means that you could support
+[multihomed architecture](http://highscalability.com/blog/2016/2/23/googles-transition-from-single-datacenter-to-failover-to-a-n.html) -
+running your app independently with autonomous databases in multiple datacenters
+in a way where you could survive an entire datacenter crash.
 
 
 Bring up the servers
@@ -36,7 +43,7 @@ Create two servers ("droplets") in Digitalocean:
 Create DNS record in Cloudflare
 -------------------------------
 
-Create record `ha.xs.fi` that points to `Server A`'s IP address.
+Create record `migrationdemo.example.com` that points to `Server A`'s IP address.
 
 Be sure to use the proxy feature of Cloudflare so TTL of DNS does not affect us
 while migrating.
@@ -62,7 +69,7 @@ $ pyramid writer-bootstrap PUBLIC_IP_OF_WRITER_SERVER
 # Ctrl + d
 ```
 
-Then start:
+Then start it:
 
 ```
 $ docker run --name pyramid -d --net=host -e "STORE=$STORE" fn61/pyramid
@@ -93,7 +100,11 @@ $ pyramid stream-appendfromfile /example example-dataimport/import.txt
 # Ctrl + d
 ```
 
-Now the base data is loaded to the `/example` stream that backs your app.
+NOTE: we would use plain Pyramid CLI instead of the app's image to run "$ pyramid",
+but we need access to the file `example-dataimport/import.txt` which only exists
+in the app image.
+
+Now the base data is loaded to the `/example` stream - the stream that backs your app.
 
 
 Start app in Server A
@@ -164,7 +175,7 @@ parallelism which is currently capped at 20 workers.
 Now you'll be getting output like this:
 
 ```
-$ ./stresstest https://ha.xs.fi 100
+$ ./stresstest https://migrationdemo.example.com 100
 2017/03/29 12:47:31 producer: failed = 0 succeeded = 0
 2017/03/29 12:47:32 producer: failed = 0 succeeded = 4
 2017/03/29 12:47:33 producer: failed = 0 succeeded = 40
@@ -214,8 +225,15 @@ Due to how Cloudflare works, this change is almost instant and not affected by D
 Look at your stresstest output - it soon notices that the server changed:
 
 ```
-2017/03/29 12:49:02 responseprocessor: instance change detected: 93920041d320
-2017/03/29 12:49:02 responseprocessor: instance change detected: 74faf0adcbaf
+2017/03/29 12:49:00 responseprocessor: instance change detected: 93920041d320
+2017/03/29 12:49:00 responseprocessor: instance change detected: 74faf0adcbaf
+2017/03/29 12:49:01 producer: failed = 0 succeeded = 40
+2017/03/29 12:49:01 responseprocessor: instance change detected: 93920041d320
+2017/03/29 12:49:01 responseprocessor: instance change detected: 74faf0adcbaf
+... many more
+2017/03/29 12:49:01 responseprocessor: instance change detected: 93920041d320
+2017/03/29 12:49:01 responseprocessor: instance change detected: 74faf0adcbaf
+2017/03/29 12:49:02 producer: failed = 0 succeeded = 40
 2017/03/29 12:49:02 responseprocessor: instance change detected: 93920041d320
 2017/03/29 12:49:02 responseprocessor: instance change detected: 74faf0adcbaf
 ```
