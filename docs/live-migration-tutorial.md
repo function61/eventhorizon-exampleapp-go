@@ -57,38 +57,20 @@ or you can even run it on a third server.
 
 Follow https://github.com/function61/eventhorizon/blob/master/docs/quickstart.md
 
-tl;dr follows:
+TL;DR follows:
 
-Bootstrap Writer:
+Create S3 bucket and API keys. Then start Writer:
 
 ```
 $ export STORE=...
-$ docker run --rm -it -e "STORE=$STORE" fn61/eventhorizon sh
-$ horizon writer-bootstrap PUBLIC_IP_OF_WRITER_SERVER
-
-# Ctrl + d
-```
-
-Then start it:
-
-```
 $ docker run --name eventhorizon -d --net=host -e "STORE=$STORE" fn61/eventhorizon
-```
-
-Then bootstrap data structures
-
-```
-$ docker run --rm -it -e "STORE=$STORE" fn61/eventhorizon sh
-$ horizon stream-create /
-$ horizon stream-create /_sub
 ```
 
 
 Bootstrap app datamodel
 ------------------------
 
-
-First, bootstrap data structures and load in the example data:
+Bootstrap application-level streams and load in the example data:
 
 ```
 $ docker run --rm -it -e "STORE=$STORE" fn61/eventhorizon-exampleapp-go bash
