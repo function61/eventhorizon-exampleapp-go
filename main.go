@@ -44,7 +44,7 @@ func NewApp() *App {
 
 	a := &App{
 		db:      db,
-		httpSrv: &http.Server{Addr: ":8080"},
+		httpSrv: &http.Server{Addr: ":80"},
 	}
 
 	// init pushlib. we give reference to an object (this - our app) that
@@ -70,7 +70,7 @@ func (a *App) Run() {
 	// this design means that you cannot have multiple instances of your app
 	// running per server unless a) your app instances use different ports
 	// b) you use Docker so all the instances have their own network namespace.
-	go pushlib.StartChildProcess("http://127.0.0.1:8080/_eventhorizon_push?auth=" + pusherAuthToken)
+	go pushlib.StartChildProcess("http://127.0.0.1/_eventhorizon_push?auth=" + pusherAuthToken)
 
 	// start HTTP server
 	go func() {
