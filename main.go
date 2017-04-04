@@ -87,7 +87,7 @@ func (a *App) Run() {
 
 // this is where all the magic happens. pushlib calls this function for every
 // incoming event from Event Horizon.
-func (a *App) PushHandleEvent(line *rtypes.ReadResultLine, tx_ interface{}) error {
+func (a *App) PushHandleEvent(stream string, line *rtypes.ReadResultLine, tx_ interface{}) error {
 	tx := tx_.(*transaction.Tx)
 
 	if line.MetaType != "" { // ignore meta events
