@@ -111,7 +111,7 @@ the changes as events to Event Horizon and it would notify your app of those eve
 But here's the interesting bit: we can skip that application altogether, and use
 Event Horizon to directly change Kelly's (`id=e1dd2e26`) name!
 
-If you look at [../events/usernamechanged.go](events/usernamechanged.go), you'll
+If you look at [events/usernamechanged.go](../events/usernamechanged.go), you'll
 learn that we can do this (in the CLI):
 
 ```
